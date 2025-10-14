@@ -45,7 +45,7 @@ func runInit(cmd *cobra.Command, args []string) error {
 
 	if !initForce {
 		if _, err := os.Stat(configPath); err == nil {
-			return fmt.Errorf("config file '%s' already exists. Use --force to overwrite.", configPath)
+			return fmt.Errorf("config file '%s' already exists. Use --force to overwrite", configPath)
 		}
 	}
 
