@@ -58,7 +58,7 @@ func init() {
 	// Add commands
 	rootCmd.AddCommand(
 		newInitCommand(),
-	// newListCommand(),
+		newListCommand(),
 	// newApplyCommand(),
 	// newNewCommand(),
 	// newFetchCommand(), // for git integration
