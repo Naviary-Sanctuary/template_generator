@@ -45,21 +45,16 @@ func runApply(cmd *cobra.Command, args []string) error {
 		applyOutputPath = args[1]
 	}
 
-	InfoColor.Printf("Applying template: %s\n", BoldColor.Sprintf(templateName))
+	InfoColor.Printf("Applying template: %s\n", BoldColor.Sprint(templateName))
 
 	cfg, err := config.Load(configPath)
 	if err != nil {
 		return fmt.Errorf("failed to load config: %w", err)
 	}
 
-	templateDir := filepath.Join(cfg.TemplatesDir, templateName)
-	if _, err := os.Stat(templateDir); os.IsNotExist(err) {
-		return fmt.Errorf("template directory '%s' does not exist", templateDir)
-	}
-
-	tmpl, err := config.LoadTemplate(templateDir)
+	templateDir, tmpl, err := resolveTemplateDir(cfg, templateName)
 	if err != nil {
-		return fmt.Errorf("failed to load template: %w", err)
+		return err
 	}
 
 	PrintVerbose("Template loaded: %s\n", tmpl.Metadata.Name)
@@ -99,4 +94,41 @@ func runApply(cmd *cobra.Command, args []string) error {
 	}
 
 	return nil
+}
+
+func resolveTemplateDir(cfg *config.Config, requestedName string) (string, *config.Template, error) {
+	candidateDir := filepath.Join(cfg.TemplatesDir, requestedName)
+	if info, err := os.Stat(candidateDir); err == nil && info.IsDir() {
+		if _, err := os.Stat(filepath.Join(candidateDir, config.TemplateConfigFile)); err == nil {
+			tmpl, err := config.LoadTemplate(candidateDir)
+			if err != nil {
+				return "", nil, fmt.Errorf("failed to load template: %w", err)
+			}
+			return candidateDir, tmpl, nil
+		}
+	}
+
+	entries, err := os.ReadDir(cfg.TemplatesDir)
+	if err != nil {
+		return "", nil, fmt.Errorf("failed to read templates directory: %w", err)
+	}
+
+	for _, entry := range entries {
+		if !entry.IsDir() {
+			continue
+		}
+		dir := filepath.Join(cfg.TemplatesDir, entry.Name())
+		if _, err := os.Stat(filepath.Join(dir, config.TemplateConfigFile)); err != nil {
+			continue
+		}
+		tmpl, err := config.LoadTemplate(dir)
+		if err != nil {
+			return "", nil, fmt.Errorf("failed to load template: %w", err)
+		}
+		if tmpl.Metadata.Name == requestedName {
+			return dir, tmpl, nil
+		}
+	}
+
+	return "", nil, fmt.Errorf("template '%s' not found in '%s'", requestedName, cfg.TemplatesDir)
 }
