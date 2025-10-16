@@ -113,7 +113,7 @@ func LoadTemplate(dir string) (*Template, error) {
 
 	for name, variable := range template.Variables {
 		if variable.Type == "" {
-			variable.Type = "any"
+			variable.Type = "string"
 			template.Variables[name] = variable
 		}
 	}

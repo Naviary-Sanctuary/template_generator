@@ -12,6 +12,7 @@ import (
 
 var (
 	applyOutputPath string
+	applyVariables  map[string]string
 )
 
 func newApplyCommand() *cobra.Command {
@@ -32,6 +33,7 @@ The output directory defaults to the current directory if not specified.`,
 	}
 
 	cmd.Flags().StringVarP(&applyOutputPath, "output", "o", ".", "Output directory")
+	cmd.Flags().StringToStringVarP(&applyVariables, "var", "v", nil, "Set variable values (e.g. -v name=John -v age=30)")
 
 	return cmd
 }
@@ -43,7 +45,7 @@ func runApply(cmd *cobra.Command, args []string) error {
 		applyOutputPath = args[1]
 	}
 
-	InfoColor.Printf("Applying template: %s\n", BoldColor.Sprint(templateName))
+	InfoColor.Printf("Applying template: %s\n", BoldColor.Sprintf(templateName))
 
 	cfg, err := config.Load(configPath)
 	if err != nil {
@@ -66,7 +68,14 @@ func runApply(cmd *cobra.Command, args []string) error {
 	variables := make(map[string]any)
 	for name, variable := range tmpl.Variables {
 		variables[name] = variable.Default
-		PrintVerbose("Variable %s = %v\n", name, variable.Default)
+	}
+
+	for key, value := range applyVariables {
+		variables[key] = value
+	}
+
+	for name, value := range variables {
+		PrintVerbose("Variable %s = %v\n", name, value)
 	}
 
 	if err := os.MkdirAll(applyOutputPath, 0755); err != nil {

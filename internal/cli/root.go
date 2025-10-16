@@ -52,7 +52,7 @@ func Execute() error {
 
 func init() {
 	// Global flags
-	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Enable verbose output")
+	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "V", false, "Enable verbose output")
 	rootCmd.PersistentFlags().StringVarP(&configPath, "config", "c", "tg.config.toml", "Path to config file")
 
 	// Add commands
