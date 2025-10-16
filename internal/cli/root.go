@@ -59,7 +59,7 @@ func init() {
 	rootCmd.AddCommand(
 		newInitCommand(),
 		newListCommand(),
-	// newApplyCommand(),
+		newApplyCommand(),
 	// newNewCommand(),
 	// newFetchCommand(), // for git integration
 	// newValidateCommand(), // for template validation
@@ -82,7 +82,7 @@ func GetConfigPath() string {
 
 // PrintVerbose prints message only in verbose mode
 func PrintVerbose(format string, args ...interface{}) {
-	if verbose {
+	if IsVerbose() {
 		fmt.Printf(format, args...)
 	}
 }

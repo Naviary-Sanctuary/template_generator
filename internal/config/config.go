@@ -5,7 +5,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/Naviary-Sanctuary/template_generator/internal/cli"
 	"github.com/pelletier/go-toml"
 )
 
@@ -174,7 +173,6 @@ func (t *Template) Validate() error {
 	if len(t.Rules.Includes) > 0 && len(t.Rules.Ignores) > 0 {
 		// This is allowed, but includes take precedence
 		// Just log a warning in verbose mode
-		cli.PrintVerbose("Template '%s': includes and ignores rules are both defined, includes take precedence", t.Metadata.Name)
 	}
 
 	return nil

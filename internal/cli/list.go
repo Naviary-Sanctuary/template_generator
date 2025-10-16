@@ -7,6 +7,7 @@ import (
 	"strings"
 	"text/tabwriter"
 
+	"github.com/Naviary-Sanctuary/template_generator/internal/config"
 	"github.com/spf13/cobra"
 )
 
@@ -117,13 +118,18 @@ func findTemplates(templatesDir string) ([]TemplateInfo, error) {
 			continue
 		}
 
+		template, err := config.LoadTemplate(templatePath)
+		if err != nil {
+			return nil, fmt.Errorf("failed to load template: %w", err)
+		}
+
 		info := TemplateInfo{
-			Name:        "Template name", // TODO: parse template.toml
+			Name:        template.Metadata.Name,
 			Path:        templatePath,
-			Description: "Template description", // TODO: parse template.toml
-			Author:      "Template author",      // TODO: parse template.toml
-			Version:     "Template version",     // TODO: parse template.toml
-			Variables:   0,                      // TODO: parse template.toml
+			Description: template.Metadata.Description,
+			Author:      template.Metadata.Author,
+			Version:     template.Version,
+			Variables:   len(template.Variables),
 		}
 
 		templates = append(templates, info)
