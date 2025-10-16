@@ -6,7 +6,6 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
-	"strings"
 	"text/template"
 
 	"github.com/Naviary-Sanctuary/template_generator/internal/config"
@@ -48,17 +47,10 @@ func (processor *Processor) Process(templateDir, outputDir string) (*ProcessResu
 			return err
 		}
 
-		fileName, err := processor.processString(d.Name())
+		outputPath, err := processor.processString(filepath.Join(outputDir, relativePath))
 		if err != nil {
-			return fmt.Errorf("failed to process file name %s: %w", d.Name(), err)
+			return fmt.Errorf("failed to process output path %s: %w", d.Name(), err)
 		}
-
-		parts := strings.Split(relativePath, "/")
-		relativePath = filepath.Join(append(parts[:len(parts)-1], fileName)...)
-
-		fmt.Println("!!!", fileName, relativePath)
-
-		outputPath := filepath.Join(outputDir, relativePath)
 
 		if d.IsDir() {
 			if err := os.MkdirAll(outputPath, 0755); err != nil {
