@@ -48,8 +48,12 @@ tg list --filter "web"`,
 }
 
 func runList(cmd *cobra.Command, args []string) error {
-	// TODO: get templates dir from config
-	templatesDir := ".tg"
+	cfg, err := config.Load(configPath)
+	if err != nil {
+		return fmt.Errorf("failed to load config: %w", err)
+	}
+
+	templatesDir := cfg.TemplatesDir
 
 	if _, err := os.Stat(templatesDir); os.IsNotExist(err) {
 		WarnColor.Printf("Templates directory %s does not exist\n", templatesDir)
