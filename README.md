@@ -33,6 +33,12 @@ A powerful and flexible CLI tool for project scaffolding using template-based fi
 
 ## Installation
 
+### Using Homebrew
+
+```bash
+brew tap naviary-sanctuary/template_generator
+```
+
 ### From Source
 
 ```bash
